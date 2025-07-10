@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- 元数据和页面标题 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Intelligence</title>
+  
+  <!-- 引入Tailwind CSS和Font Awesome图标库 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind CSS自定义颜色和字体 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appleBlue: '#0071e3',
+            appleGray: '#86868b',
+            appleDark: '#161617',
+            appleLight: '#f5f5f7',
+            deepseek: '#165DFF',
+            deepseekLight: '#4080FF',
+          },
+          fontFamily: {
+            apple: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义Tailwind CSS实用类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      /* 内容自动可见性 */
+      .content-auto {
+        content-visibility: auto;
+      }
+      /* 液态玻璃效果 */
+      .liquid-glass {
+        backdrop-filter: blur(20px);
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .liquid-glass-dark {
+        backdrop-filter: blur(20px);
+        background-color: rgba(22, 22, 23, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      /* 苹果风格阴影 */
+      .apple-shadow {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      /* 苹果窗口边框 */
+      .apple-window-border {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      /* 窗口控制按钮 */
+      .window-controls {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .close { background-color: #ff5f56; }
+      .minimize { background-color: #ffbd2e; }
+      .maximize { background-color: #27c93f; }
+      /* Mac风格过渡效果 */
+      .mac-transition {
+        transition: all 0.2s ease-in-out;
+      }
+      /* 文本渐变效果 */
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        background-image: linear-gradient(90deg, #165DFF, #4080FF);
+      }
+      /* 聊天气泡样式 */
+      .chat-bubble-user {
+        background: linear-gradient(135deg, #165DFF 0%, #4080FF 100%);
+        color: white;
+        border-radius: 18px 18px 0 18px;
+      }
+      .chat-bubble-ai {
+        background-color: white;
+        color: #333;
+        border-radius: 18px 18px 18px 0;
+      }
+      /* 登录输入框样式 */
+      .login-input {
+        @apply w-full px-4 py-3 rounded-lg bg-white/80 border border-gray-200/50 focus:outline-none focus:ring-2 focus:ring-deepseek/50;
+      }
+      /* 登录按钮样式 */
+      .login-button {
+        @apply w-full py-3 rounded-lg bg-gradient-to-r from-deepseek to-deepseekLight text-white font-medium hover:opacity-90 transition-opacity;
+      }
+    }
+  </style>
+</head>
+<body class="font-apple bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen overflow-hidden">
+  <!-- 背景图片 -->
+  <div class="fixed inset-0 bg-[url('https://picsum.photos/id/1067/1920/1080')] bg-cover bg-center opacity-20"></div>
+  
+  <!-- 顶部菜单栏 -->
+  <div class="fixed top-0 left-0 right-0 h-10 liquid-glass-dark text-white flex items-center z-50">
+    <div class="flex items-center ml-4">
+      <i class="fa fa-apple text-2xl mr-4"></i>
+      <span class="text-sm font-medium">Apple Intelligence</span>
+    </div>
+    <div class="ml-auto mr-4 flex items-center space-x-6">
+      <span class="text-xs opacity-80">文件</span>
+      <span class="text-xs opacity-80">编辑</span>
+      <span class="text-xs opacity-80">视图</span>
+      <span class="text-xs opacity-80">窗口</span>
+      <span class="text-xs opacity-80">帮助</span>
+      <div class="flex items-center">
+        <i class="fa fa-search text-xs opacity-80 mr-4"></i>
+        <i class="fa fa-bell text-xs opacity-80 mr-4"></i>
+        <span class="text-xs">12:45</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 登录界面 -->
+  <div id="login-screen" class="fixed inset-0 flex items-center justify-center z-40 liquid-glass-dark">
+    <div class="w-[400px] p-8 rounded-2xl apple-shadow liquid-glass">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mb-4">
+          <i class="fa fa-robot text-white text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-appleDark">欢迎使用</h2>
+        <p class="text-gray-600 mt-2">请登录以继续使用 Apple Intelligence</p>
+      </div>
+      
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fa fa-envelope-o"></i>
+            </span>
+            <input type="email" id="email" class="login-input pl-10" placeholder="example@apple.com" required>
+          </div>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fa fa-lock"></i>
+            </span>
+            <input type="password" id="password" class="login-input pl-10" placeholder="••••••••" required>
+            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+              <i class="fa fa-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <input type="checkbox" id="remember-me" class="w-4 h-4 text-deepseek focus:ring-deepseek rounded">
+            <label for="remember-me" class="ml-2 text-sm text-gray-600">记住我</label>
+          </div>
+          <a href="#" class="text-sm text-deepseek hover:underline">忘记密码?</a>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <button type="button" id="local-login-button" class="login-button">
+            <i class="fa fa-database mr-2"></i>本地登录
+          </button>
+          <button type="submit" class="login-button">
+            <i class="fa fa-sign-in mr-2"></i>云端登录
+          </button>
+        </div>
+        
+        <div class="text-center text-sm text-gray-600">
+          还没有账户? <a href="#" class="text-deepseek hover:underline">注册</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- AI聊天窗口 -->
+  <div id="chat-window" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] liquid-glass apple-window-border apple-shadow z-30 hidden">
+    <!-- 窗口标题栏 -->
+    <div class="h-10 flex items-center px-4 border-b border-gray-200/30">
+      <div class="flex items-center">
+        <span class="window-controls close"></span>
+        <span class="window-controls minimize"></span>
+        <span class="window-controls maximize"></span>
+      </div>
+      <div class="ml-auto mr-auto flex items-center">
+        <i class="fa fa-robot text-deepseek mr-2"></i>
+        <span class="text-sm font-medium">DeepSeek AI Assistant</span>
+      </div>
+      <div class="flex items-center">
+        <i class="fa fa-user-circle-o text-gray-500 mr-2"></i>
+        <span id="username-display" class="text-xs text-gray-600 mr-4">访客</span>
+        <i class="fa fa-sign-out text-gray-500 cursor-pointer" id="logout-button"></i>
+      </div>
+    </div>
+    
+    <!-- 聊天内容区域 -->
+    <div class="h-[calc(100%-100px)] p-4 overflow-y-auto mac-scrollbar">
+      <!-- 欢迎消息 -->
+      <div class="flex items-start mb-6">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+          <i class="fa fa-robot text-white"></i>
+        </div>
+        <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+          <p class="text-sm">你好！我是基于DeepSeek技术的Apple Intelligence助手。我可以帮你解答问题、生成内容、提供建议等。请问有什么可以帮助你的吗？</p>
+        </div>
+      </div>
+      
+      <!-- 用户消息 -->
+      <div class="flex items-start justify-end mb-6">
+        <div class="chat-bubble-user p-4 max-w-[80%] shadow-md">
+          <p class="text-sm">你能介绍一下自己的功能吗？</p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center ml-3 flex-shrink-0">
+          <i class="fa fa-user text-gray-700"></i>
+        </div>
+      </div>
+      
+      <!-- AI回复 -->
+      <div class="flex items-start mb-6">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+          <i class="fa fa-robot text-white"></i>
+        </div>
+        <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+          <p class="text-sm">当然可以！我是基于DeepSeek大模型开发的AI助手，具备以下能力：</p>
+          <ul class="list-disc pl-5 mt-2 text-sm">
+            <li>自然语言理解与对话</li>
+            <li>知识问答与解释</li>
+            <li>文本生成与创意写作</li>
+            <li>代码编写与调试</li>
+            <li>问题解决与建议</li>
+            <li>多语言支持</li>
+          </ul>
+          <p class="text-sm mt-2">我会不断学习和进化，以提供更好的服务。有什么具体需求，请随时告诉我！</p>
+        </div>
+      </div>
+      
+      <!-- 等待回复状态 -->
+      <div class="flex items-start mb-6" id="loading-indicator">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+          <i class="fa fa-robot text-white"></i>
+        </div>
+        <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+          <div class="flex space-x-1">
+            <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
+            <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></div>
+            <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.4s"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 输入区域 -->
+    <div class="h-12 p-2 border-t border-gray-200/30 flex items-center">
+      <input id="user-input" type="text" placeholder="输入你的问题..." class="flex-1 h-full rounded-full pl-4 pr-4 bg-white/70 border-none outline-none text-sm">
+      <button id="send-button" class="w-8 h-8 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center text-white ml-2 hover:opacity-90 transition-opacity">
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+  
+  <!-- 浮动信息面板 -->
+  <div id="info-panel" class="fixed top-20 right-20 w-64 liquid-glass rounded-xl p-4 apple-shadow z-20 hidden">
+    <div class="flex items-center mb-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3">
+        <i class="fa fa-microchip text-white"></i>
+      </div>
+      <div>
+        <h3 class="font-semibold text-sm">DeepSeek技术</h3>
+        <p class="text-xs text-gray-600">由深度求索提供支持</p>
+      </div>
+    </div>
+    <div class="text-xs text-gray-700 mb-3">
+      <p>• 671B参数的大型语言模型</p>
+      <p>• 支持128K上下文长度</p>
+      <p>• 多模态理解能力</p>
+    </div>
+    <div class="text-xs text-gray-500">
+      <p>持续学习中...</p>
+      <div class="w-full h-1 bg-gray-200 rounded-full mt-1">
+        <div class="w-3/4 h-full bg-gradient-to-r from-deepseek to-deepseekLight rounded-full"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 半透明浮动标题 -->
+  <div id="title-panel" class="fixed top-1/4 left-1/4 liquid-glass-dark px-6 py-3 rounded-xl z-10 hidden">
+    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-white">Apple <span class="text-gradient">Intelligence</span></h1>
+    <p class="text-white/80 text-sm">AI与苹果设计的完美融合</p>
+  </div>
+  
+  <!-- JavaScript代码 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取DOM元素
+      const loginScreen = document.getElementById('login-screen');
+      const chatWindow = document.getElementById('chat-window');
+      const infoPanel = document.getElementById('info-panel');
+      const titlePanel = document.getElementById('title-panel');
+      const loginForm = document.getElementById('login-form');
+      const usernameDisplay = document.getElementById('username-display');
+      const logoutButton = document.getElementById('logout-button');
+      const togglePassword = document.getElementById('toggle-password');
+      const passwordInput = document.getElementById('password');
+      const localLoginButton = document.getElementById('local-login-button');
+      
+      // 切换密码可见性
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePassword.innerHTML = type === 'password' ? '<i class="fa fa-eye-slash"></i>' : '<i class="fa fa-eye"></i>';
+      });
+      
+      // 本地登录
+      localLoginButton.addEventListener('click', function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+        
+        // 验证邮箱和密码
+        if (!email || !password) {
+          alert('请输入邮箱和密码');
+          return;
+        }
+        
+        // 模拟本地登录验证
+        if (email === 'local@apple.com' && password === '123456') {
+          // 显示加载状态
+          localLoginButton.disabled = true;
+          localLoginButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>登录中...';
+          
+          // 模拟登录过程
+          setTimeout(() => {
+            // 隐藏登录界面，显示主界面
+            loginScreen.classList.add('hidden');
+            chatWindow.classList.remove('hidden');
+            infoPanel.classList.remove('hidden');
+            titlePanel.classList.remove('hidden');
+            
+            // 设置用户名显示
+            const username = email.split('@')[0];
+            usernameDisplay.textContent = username;
+            
+            // 保存用户信息到本地存储
+            if (rememberMe) {
+              localStorage.setItem('apple_intelligence_user', JSON.stringify({
+                email: email,
+                username: username
+              }));
+            }
+            
+            // 重置登录按钮
+            localLoginButton.disabled = false;
+            localLoginButton.innerHTML = '<i class="fa fa-database mr-2"></i>本地登录';
+            
+            // 清空表单
+            loginForm.reset();
+            
+            // 显示欢迎消息
+            const chatContainer = chatWindow.querySelector('.h-[calc(100%-100px)]');
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'flex items-start mb-6';
+            welcomeMessage.innerHTML = `
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+                <i class="fa fa-robot text-white"></i>
+              </div>
+              <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+                <p class="text-sm">欢迎回来，${username}！很高兴再次为你服务。有什么我可以帮助你的吗？</p>
+              </div>
+            `;
+            
+            // 移除loading indicator
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) {
+              loadingIndicator.remove();
+            }
+            
+            // 添加欢迎消息
+            chatContainer.appendChild(welcomeMessage);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }, 1500);
+        } else {
+          alert('邮箱或密码错误');
+        }
+      });
+      
+      // 云端登录表单提交
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const username = email.split('@')[0]; // 简单处理，取邮箱前缀作为用户名
+        
+        // 显示加载状态
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>登录中...';
+        
+        // 模拟登录过程
+        setTimeout(() => {
+          // 隐藏登录界面，显示主界面
+          loginScreen.classList.add('hidden');
+          chatWindow.classList.remove('hidden');
+          infoPanel.classList.remove('hidden');
+          titlePanel.classList.remove('hidden');
+          
+          // 设置用户名显示
+          usernameDisplay.textContent = username;
+          
+          // 重置登录按钮
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalText;
+          
+          // 清空表单
+          loginForm.reset();
+          
+          // 显示欢迎消息
+          const chatContainer = chatWindow.querySelector('.h-[calc(100%-100px)]');
+          const welcomeMessage = document.createElement('div');
+          welcomeMessage.className = 'flex items-start mb-6';
+          welcomeMessage.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+              <i class="fa fa-robot text-white"></i>
+            </div>
+            <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+              <p class="text-sm">欢迎回来，${username}！很高兴再次为你服务。有什么我可以帮助你的吗？</p>
+            </div>
+          `;
+          
+          // 移除loading indicator
+          const loadingIndicator = document.getElementById('loading-indicator');
+          if (loadingIndicator) {
+            loadingIndicator.remove();
+          }
+          
+          // 添加欢迎消息
+          chatContainer.appendChild(welcomeMessage);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1500);
+      });
+      
+      // 退出登录
+      logoutButton.addEventListener('click', function() {
+        // 显示确认对话框
+        if (confirm('确定要退出登录吗？')) {
+          // 移除本地存储的用户信息
+          localStorage.removeItem('apple_intelligence_user');
+          
+          // 隐藏主界面，显示登录界面
+          chatWindow.classList.add('hidden');
+          infoPanel.classList.add('hidden');
+          titlePanel.classList.add('hidden');
+          loginScreen.classList.remove('hidden');
+          
+          // 重置用户名显示
+          usernameDisplay.textContent = '访客';
+        }
+      });
+      
+      // 检查本地存储中是否有用户信息
+      const savedUser = localStorage.getItem('apple_intelligence_user');
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        
+        // 自动填充登录表单
+        document.getElementById('email').value = userData.email;
+        document.getElementById('remember-me').checked = true;
+      }
+      
+      // 窗口控制按钮功能
+      const windowElement = document.getElementById('chat-window');
+      const minimizeBtn = windowElement.querySelector('.minimize');
+      const maximizeBtn = windowElement.querySelector('.maximize');
+      const closeBtn = windowElement.querySelector('.close');
+      
+      minimizeBtn.addEventListener('click', function() {
+        windowElement.style.display = 'none';
+      });
+      
+      maximizeBtn.addEventListener('click', function() {
+        if (windowElement.classList.contains('maximized')) {
+          // 恢复窗口
+          windowElement.style.width = '800px';
+          windowElement.style.height = '600px';
+          windowElement.style.left = '50%';
+          windowElement.style.top = '50%';
+          windowElement.classList.remove('maximized');
+        } else {
+          // 最大化窗口
+          windowElement.style.width = '100%';
+          windowElement.style.height = '100%';
+          windowElement.style.left = '0';
+          windowElement.style.top = '0';
+          windowElement.classList.add('maximized');
+        }
+      });
+      
+      closeBtn.addEventListener('click', function() {
+        if (confirm('确定要关闭Apple Intelligence吗？')) {
+          windowElement.style.display = 'none';
+        }
+      });
+      
+      // 聊天功能
+      const userInput = document.getElementById('user-input');
+      const sendButton = document.getElementById('send-button');
+      const chatContainer = windowElement.querySelector('.h-[calc(100%-100px)]');
+      
+      sendButton.addEventListener('click', function() {
+        const message = userInput.value.trim();
+        if (message === '') return;
+        
+        // 添加用户消息到聊天界面
+        const userMessage = document.createElement('div');
+        userMessage.className = 'flex items-start justify-end mb-6';
+        userMessage.innerHTML = `
+          <div class="chat-bubble-user p-4 max-w-[80%] shadow-md">
+            <p class="text-sm">${message}</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center ml-3 flex-shrink-0">
+            <i class="fa fa-user text-gray-700"></i>
+          </div>
+        `;
+        chatContainer.appendChild(userMessage);
+        
+        // 清空输入框
+        userInput.value = '';
+        
+        // 添加加载指示器
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'loading-indicator';
+        loadingIndicator.className = 'flex items-start mb-6';
+        loadingIndicator.innerHTML = `
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+            <i class="fa fa-robot text-white"></i>
+          </div>
+          <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+            <div class="flex space-x-1">
+              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
+              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></div>
+              <div class="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.4s"></div>
+            </div>
+          </div>
+        `;
+        chatContainer.appendChild(loadingIndicator);
+        
+        // 滚动到底部
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // 模拟AI回复
+        setTimeout(() => {
+          // 移除加载指示器
+          if (loadingIndicator && loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+          }
+          
+          // 添加AI回复
+          const aiResponses = [
+            `${usernameDisplay.textContent}，我理解您的需求，正在为您分析和生成相关内容...`,
+            `${usernameDisplay.textContent}，根据您的问题，我可以提供以下建议和解决方案...`,
+            `${usernameDisplay.textContent}，这是一个很有趣的问题，让我结合最新的知识和数据为您解答...`,
+            `${usernameDisplay.textContent}，我已经处理了您的请求，以下是详细的分析和结论...`,
+            `${usernameDisplay.textContent}，感谢您的提问，我将从多个角度为您提供全面的回答...`
+          ];
+          
+          const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+          
+          const aiMessage = document.createElement('div');
+          aiMessage.className = 'flex items-start mb-6';
+          aiMessage.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-deepseek to-deepseekLight flex items-center justify-center mr-3 flex-shrink-0">
+              <i class="fa fa-robot text-white"></i>
+            </div>
+            <div class="chat-bubble-ai p-4 max-w-[80%] shadow-md">
+              <p class="text-sm">${randomResponse}</p>
+            </div>
+          `;
+          
+          chatContainer.appendChild(aiMessage);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1500);
+      });
+      
+      userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendButton.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>    
